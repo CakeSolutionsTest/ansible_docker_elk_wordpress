@@ -1,0 +1,2 @@
+# ansible_docker_elk_wordpress
+Dockerized WordPress application
