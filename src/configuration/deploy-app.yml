@@ -1,0 +1,25 @@
+---
+
+- name: Deploy application
+  hosts: vm
+  remote_user: ubuntu
+  gather_facts: False
+
+
+  tasks:
+
+    - name: Copy application configuration
+      copy: src=./docker/application dest=/home/ubuntu/
+
+    - name: Get logstash IPAddress
+      command: docker inspect --format '{{ .NetworkSettings.IPAddress }}' logstash
+      register: logstashIp
+
+    - name: Update ip address in docker-app.yml
+      lineinfile: 'dest=/home/ubuntu/application/docker-app.yml regexp="^   syslog-address"   line="   syslog-address: \"tcp://{{ logstashIp.stdout }}:25826\""'
+
+    - name: Build applicaton docker images
+      command: docker-compose -f ~/application/docker-app.yml build
+
+    - name: Start dokcer container application services
+      command: docker-compose -f ~/application/docker-app.yml up -d
