@@ -1,0 +1,19 @@
+---
+
+- name: Deploy ELK stack
+  hosts: vm
+  remote_user: ubuntu
+  gather_facts: False
+
+
+  tasks:
+
+    - name: Copy elk-stack configuration
+      copy: src=./docker/elk-stack dest=/home/ubuntu/
+
+    - name: Build elk docker images
+      command: docker-compose -f ~/elk-stack/docker-elk.yml build
+
+    - name: Start docker container elk services
+      command: docker-compose -f ~/elk-stack/docker-elk.yml up -d
+
